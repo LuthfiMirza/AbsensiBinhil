@@ -20,6 +20,8 @@ class DemoAttendanceSeeder extends Seeder
                 'name' => 'Demo Admin',
                 'password' => Hash::make('password123'),
                 'email_verified_at' => now(),
+                'role' => 'admin',
+                'employee_id' => null,
             ]
         );
 
@@ -32,14 +34,14 @@ class DemoAttendanceSeeder extends Seeder
     private function seedEmployees(): array
     {
         $rows = [
-            ['name' => 'Andi Saputra', 'employee_code' => 'PTG-001', 'area' => 'Blok A', 'shift' => 'pagi', 'phone' => '0812-1000-0001'],
-            ['name' => 'Budi Santoso', 'employee_code' => 'PTG-002', 'area' => 'Blok A', 'shift' => 'pagi', 'phone' => '0812-1000-0002'],
-            ['name' => 'Citra Dewi', 'employee_code' => 'PTG-003', 'area' => 'Blok B', 'shift' => 'siang', 'phone' => '0812-1000-0003'],
-            ['name' => 'Deni Pratama', 'employee_code' => 'PTG-004', 'area' => 'Blok B', 'shift' => 'siang', 'phone' => '0812-1000-0004'],
-            ['name' => 'Eka Lestari', 'employee_code' => 'PTG-005', 'area' => 'Blok C', 'shift' => 'pagi', 'phone' => '0812-1000-0005'],
-            ['name' => 'Fajar Nugroho', 'employee_code' => 'PTG-006', 'area' => 'Lobby', 'shift' => 'pagi', 'phone' => '0812-1000-0006'],
-            ['name' => 'Gina Permata', 'employee_code' => 'PTG-007', 'area' => 'Toilet Umum', 'shift' => 'siang', 'phone' => '0812-1000-0007'],
-            ['name' => 'Hadi Wijaya', 'employee_code' => 'PTG-008', 'area' => 'Toilet Umum', 'shift' => 'sore', 'phone' => '0812-1000-0008'],
+            ['name' => 'Andi Saputra', 'email' => 'andi@demo.test', 'employee_code' => 'PTG-001', 'area' => 'Blok A', 'shift' => 'pagi', 'phone' => '0812-1000-0001'],
+            ['name' => 'Budi Santoso', 'email' => 'budi@demo.test', 'employee_code' => 'PTG-002', 'area' => 'Blok A', 'shift' => 'pagi', 'phone' => '0812-1000-0002'],
+            ['name' => 'Citra Dewi', 'email' => 'citra@demo.test', 'employee_code' => 'PTG-003', 'area' => 'Blok B', 'shift' => 'siang', 'phone' => '0812-1000-0003'],
+            ['name' => 'Deni Pratama', 'email' => 'deni@demo.test', 'employee_code' => 'PTG-004', 'area' => 'Blok B', 'shift' => 'siang', 'phone' => '0812-1000-0004'],
+            ['name' => 'Eka Lestari', 'email' => 'eka@demo.test', 'employee_code' => 'PTG-005', 'area' => 'Blok C', 'shift' => 'pagi', 'phone' => '0812-1000-0005'],
+            ['name' => 'Fajar Nugroho', 'email' => 'fajar@demo.test', 'employee_code' => 'PTG-006', 'area' => 'Lobby', 'shift' => 'pagi', 'phone' => '0812-1000-0006'],
+            ['name' => 'Gina Permata', 'email' => 'gina@demo.test', 'employee_code' => 'PTG-007', 'area' => 'Toilet Umum', 'shift' => 'siang', 'phone' => '0812-1000-0007'],
+            ['name' => 'Hadi Wijaya', 'email' => 'hadi@demo.test', 'employee_code' => 'PTG-008', 'area' => 'Toilet Umum', 'shift' => 'sore', 'phone' => '0812-1000-0008'],
         ];
 
         $employees = [];
@@ -47,8 +49,21 @@ class DemoAttendanceSeeder extends Seeder
         foreach ($rows as $row) {
             $employees[$row['employee_code']] = Employee::query()->updateOrCreate(
                 ['employee_code' => $row['employee_code']],
-                array_merge($row, ['is_active' => true])
+                array_merge(collect($row)->except('email')->all(), ['is_active' => true])
             );
+
+            foreach ([$row['email'], strtolower($row['employee_code']).'@demo.test'] as $email) {
+                User::query()->updateOrCreate(
+                    ['email' => $email],
+                    [
+                        'name' => $row['name'],
+                        'password' => Hash::make('password123'),
+                        'email_verified_at' => now(),
+                        'role' => 'employee',
+                        'employee_id' => $employees[$row['employee_code']]->id,
+                    ]
+                );
+            }
         }
 
         return $employees;
@@ -125,19 +140,28 @@ class DemoAttendanceSeeder extends Seeder
 
     private function upsertAttendance(Employee $employee, Carbon $date, string $status, ?string $checkIn, ?string $checkOut, int $lateMinutes, ?string $notes = null): void
     {
-        Attendance::query()->updateOrCreate(
-            [
-                'employee_id' => $employee->id,
-                'date' => $date->toDateString(),
-            ],
-            [
-                'check_in' => $checkIn,
-                'check_out' => $checkOut,
-                'status' => $status,
-                'late_minutes' => $lateMinutes,
-                'notes' => $notes,
-            ]
-        );
+        $attendance = Attendance::query()
+            ->where('employee_id', $employee->id)
+            ->whereDate('date', $date->toDateString())
+            ->first();
+
+        $values = [
+            'check_in' => $checkIn,
+            'check_out' => $checkOut,
+            'status' => $status,
+            'late_minutes' => $lateMinutes,
+            'notes' => $notes,
+        ];
+
+        if ($attendance) {
+            $attendance->update($values);
+            return;
+        }
+
+        Attendance::query()->create(array_merge($values, [
+            'employee_id' => $employee->id,
+            'date' => $date->toDateString(),
+        ]));
     }
 
     private function firstSundayOfMonth(Carbon $monthStart): ?Carbon

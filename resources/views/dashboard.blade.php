@@ -1,25 +1,36 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app')
+@section('title', 'Dashboard')
+@section('header', 'Dashboard')
+@section('subtitle', 'Ringkasan operasional absensi petugas Bintaro Hill')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    {{ __("You're logged in!") }}
-                </div>
-            </div>
-        </div>
+@section('content')
+<div class="page-header">
+    <div>
+        <h2>Selamat Datang</h2>
+        <p>Gunakan menu di samping untuk memantau absensi, menginput kehadiran, dan melihat laporan bulanan.</p>
     </div>
-</x-app-layout>
+</div>
 
-<form method="POST" action="{{ route('employee.logout') }}">
-    @csrf
-    <button type="submit"
-            class="bg-gray-700 text-gray-300 text-xs px-3 py-2 rounded-lg hover:bg-red-600 hover:text-white transition">
-        Keluar
-    </button>
-</form>
+<div class="stats-grid">
+    <a href="{{ route('attendances.index') }}" class="stat-card" style="text-decoration:none;--accent:#5e6640;--accent-soft:#eef1e6;">
+        <p class="stat-label">Absensi Harian</p>
+        <p class="stat-value">↗</p>
+        <p class="stat-note">Pantau kehadiran hari ini</p>
+    </a>
+    <a href="{{ route('attendances.create') }}" class="stat-card" style="text-decoration:none;--accent:#4f7d45;--accent-soft:#edf5e9;">
+        <p class="stat-label">Input Absensi</p>
+        <p class="stat-value">+</p>
+        <p class="stat-note">Catat check-in/check-out</p>
+    </a>
+    <a href="{{ route('employees.index') }}" class="stat-card" style="text-decoration:none;--accent:#d99a25;--accent-soft:#fff4df;">
+        <p class="stat-label">Data Petugas</p>
+        <p class="stat-value">☷</p>
+        <p class="stat-note">Kelola area dan shift</p>
+    </a>
+    <a href="{{ route('reports.monthly') }}" class="stat-card" style="text-decoration:none;--accent:#5e6640;--accent-soft:#eef1e6;">
+        <p class="stat-label">Laporan Bulanan</p>
+        <p class="stat-value">▦</p>
+        <p class="stat-note">Evaluasi performa petugas</p>
+    </a>
+</div>
+@endsection

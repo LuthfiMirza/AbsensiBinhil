@@ -36,7 +36,9 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $redirectRoute = $request->user()->isEmployee() ? 'my-attendance.index' : 'dashboard';
+
+        return redirect()->intended(route($redirectRoute, absolute: false));
     }
 
     /**

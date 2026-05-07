@@ -14,7 +14,7 @@ class MonthlyReportTest extends TestCase
 
     public function test_monthly_report_counts_statuses_filters_area_and_uses_dynamic_years(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'admin']);
         $blokA = Employee::create([
             'name' => 'Petugas Blok A',
             'employee_code' => 'PTG-001',
@@ -41,15 +41,15 @@ class MonthlyReportTest extends TestCase
         $response->assertSee('Petugas Blok A');
         $response->assertDontSee('Petugas Blok B');
         $response->assertSee('2026');
-        $response->assertSee('Hari kerja bulan ini: 26 hari');
+        $response->assertSee('26 hari kerja');
         $response->assertSee('>2<', false);
         $response->assertSee('>1<', false);
-        $response->assertSee('30 mnt');
+        $response->assertSee('30 menit');
     }
 
     public function test_monthly_report_handles_employee_without_attendance_and_ignores_sunday_records(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'admin']);
         $employee = Employee::create([
             'name' => 'Petugas Kosong',
             'employee_code' => 'PTG-001',
@@ -69,7 +69,7 @@ class MonthlyReportTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Petugas Kosong');
-        $response->assertSee('Hari kerja bulan ini: 26 hari');
+        $response->assertSee('26 hari kerja');
         $response->assertSee('>0<', false);
     }
 }

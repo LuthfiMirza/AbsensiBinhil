@@ -14,7 +14,7 @@ class MonthlyExportTest extends TestCase
 
     public function test_monthly_export_csv_uses_filters_and_expected_columns(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'admin']);
         $blokA = Employee::create([
             'name' => 'Petugas CSV A',
             'employee_code' => 'PTG-001',

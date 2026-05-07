@@ -14,7 +14,7 @@ class MonthlyDetailTest extends TestCase
 
     public function test_monthly_detail_shows_all_dates_statuses_missing_data_and_sundays(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'admin']);
         $employee = Employee::create([
             'name' => 'Petugas Detail',
             'employee_code' => 'PTG-001',
@@ -38,8 +38,8 @@ class MonthlyDetailTest extends TestCase
         $response->assertSee('31 May 2026');
         $response->assertSee('Tepat Waktu');
         $response->assertSee('Terlambat');
-        $response->assertSee('Absent');
-        $response->assertSee('Belum ada data');
+        $response->assertSee('Tidak Hadir');
+        $response->assertSee('Belum Ada Data');
         $response->assertSee('Libur');
         $response->assertSee('20 menit');
     }

@@ -10,9 +10,9 @@ use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $today = Carbon::today()->toDateString();
+        $today = $request->date ?? Carbon::today()->toDateString();
         $attendances = Attendance::with('employee')
                         ->where('date', $today)
                         ->latest()

@@ -103,7 +103,10 @@
             .sidebar-footer { display: block; padding-top: 12px; margin-top: 12px; }
             .app-topbar { padding: 18px 20px; align-items: flex-start; }
             .user-pill { display: none; }
-            .app-content { padding: 22px 18px 34px; }
+            .app-content { padding: 22px 18px 34px; max-width: 100%; }
+            .app-shell-employee .app-sidebar,
+            .app-shell-employee .app-topbar { display: none; }
+            .app-shell-employee .app-content { padding: 16px; }
             .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
         @media (max-width: 520px) {
@@ -120,7 +123,7 @@
     $user = auth()->user();
     $initial = $user ? strtoupper(substr($user->name, 0, 1)) : 'A';
 @endphp
-<div class="app-shell">
+<div class="app-shell {{ $user?->isEmployee() ? 'app-shell-employee' : 'app-shell-admin' }}">
     <aside class="app-sidebar">
         <div class="brand">
             <img src="{{ asset('images/logobintarohill.png') }}" alt="Bintaro Hill">

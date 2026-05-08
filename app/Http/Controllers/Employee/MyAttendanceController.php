@@ -16,6 +16,7 @@ class MyAttendanceController extends Controller
     {
         $employee = $request->user()->employee;
         $today = Carbon::today()->toDateString();
+        $isHoliday = Carbon::parse($today)->isSunday();
         $attendance = Attendance::query()
             ->where('employee_id', $employee->id)
             ->whereDate('date', $today)
@@ -29,7 +30,7 @@ class MyAttendanceController extends Controller
             ->limit(15)
             ->get();
 
-        return view('employee.my-attendance', compact('employee', 'today', 'attendance', 'history'));
+        return view('employee.my-attendance', compact('employee', 'today', 'attendance', 'history', 'isHoliday'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -40,12 +41,24 @@ class MyAttendanceController extends Controller
 
         $employee = $request->user()->employee;
         $today = Carbon::today()->toDateString();
+
+        if (Carbon::parse($today)->isSunday()) {
+            return back()->with('error', 'Hari ini libur. Absensi tidak dibuka.');
+        }
+
         $now = Carbon::now();
 
-        $attendance = Attendance::query()->firstOrNew([
-            'employee_id' => $employee->id,
-            'date' => $today,
-        ]);
+        $attendance = Attendance::query()
+            ->where('employee_id', $employee->id)
+            ->whereDate('date', $today)
+            ->first();
+
+        if (! $attendance) {
+            $attendance = new Attendance([
+                'employee_id' => $employee->id,
+                'date' => $today,
+            ]);
+        }
 
         if ($request->type === 'check_in') {
             if ($attendance->check_in) {

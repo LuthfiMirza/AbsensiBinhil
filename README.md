@@ -563,37 +563,128 @@ routes/web.php
 routes/console.php
 ```
 
-## Instalasi dan Menjalankan Project
+## Panduan Clone dan Menjalankan di Lokal Baru
 
-### 1. Install Dependency PHP
+Bagian ini dipakai jika project akan dijalankan di komputer/laptop lain dari awal.
+
+### 1. Prasyarat
+
+Pastikan komputer sudah memiliki:
+
+- PHP minimal `8.2`.
+- Composer.
+- Node.js dan npm.
+- MySQL/MariaDB, misalnya dari XAMPP.
+- Git.
+
+Cek versi:
+
+```bash
+php -v
+composer -V
+node -v
+npm -v
+git --version
+```
+
+### 2. Clone Repository
+
+Clone project dari GitHub:
+
+```bash
+git clone https://github.com/LuthfiMirza/AbsensiBinhil.git
+```
+
+Masuk ke folder project:
+
+```bash
+cd AbsensiBinhil
+```
+
+Jika menjalankan lewat XAMPP di macOS, folder project biasanya bisa diletakkan di:
+
+```text
+/Applications/XAMPP/xamppfiles/htdocs/AbsensiBinhil
+```
+
+Jika menjalankan lewat XAMPP di Windows, folder project biasanya bisa diletakkan di:
+
+```text
+C:\xampp\htdocs\AbsensiBinhil
+```
+
+### 3. Install Dependency PHP
+
+Jalankan:
 
 ```bash
 composer install
 ```
 
-### 2. Install Dependency Frontend
+Jika `vendor` belum ada, command ini akan membuat folder `vendor` dan mengunduh dependency Laravel.
+
+### 4. Install Dependency Frontend
+
+Jalankan:
 
 ```bash
 npm install
 ```
 
-### 3. Buat File Environment
+Command ini akan membuat folder `node_modules`.
+
+### 5. Buat File `.env`
+
+Salin file environment contoh:
 
 ```bash
 cp .env.example .env
 ```
 
-### 4. Generate App Key
+Untuk Windows Command Prompt:
+
+```bat
+copy .env.example .env
+```
+
+### 6. Generate Application Key
+
+Jalankan:
 
 ```bash
 php artisan key:generate
 ```
 
-### 5. Atur Database
+Command ini akan mengisi `APP_KEY` di file `.env`.
 
-Sesuaikan konfigurasi database pada file `.env`.
+### 7. Buat Database Lokal
 
-Contoh konfigurasi MySQL lokal:
+Buat database baru di MySQL/phpMyAdmin.
+
+Nama database yang direkomendasikan:
+
+```text
+absensibinhil
+```
+
+Jika memakai XAMPP:
+
+1. Jalankan Apache dan MySQL dari XAMPP Control Panel.
+2. Buka phpMyAdmin:
+
+```text
+http://localhost/phpmyadmin
+```
+
+3. Klik menu `Databases`.
+4. Buat database baru bernama `absensibinhil`.
+5. Gunakan collation default atau `utf8mb4_unicode_ci`.
+
+### 8. Atur Koneksi Database di `.env`
+
+Buka file `.env`, lalu sesuaikan bagian database.
+
+Contoh untuk XAMPP default:
 
 ```env
 DB_CONNECTION=mysql
@@ -604,34 +695,251 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-### 6. Jalankan Migration dan Seeder
+Jika MySQL memakai password, isi `DB_PASSWORD` sesuai password lokal.
+
+Contoh:
+
+```env
+DB_PASSWORD=password_mysql_kamu
+```
+
+### 9. Jalankan Migration
+
+Migration akan membuat tabel seperti `users`, `employees`, `attendances`, dan `work_schedules`.
+
+Jalankan:
+
+```bash
+php artisan migrate
+```
+
+Jika ingin langsung menjalankan seeder default:
 
 ```bash
 php artisan migrate --seed
 ```
 
-Jika ingin menambahkan data demo petugas dan absensi:
+Seeder default akan membuat:
+
+- Akun admin default.
+- Data shift kerja default.
+
+Akun admin default:
+
+```text
+Email    : test@example.com
+Password : password
+Role     : admin
+```
+
+### 10. Jalankan Seeder Demo
+
+Seeder demo berguna untuk mencoba aplikasi dengan data petugas, akun petugas, dan contoh absensi.
+
+Jalankan:
 
 ```bash
 php artisan db:seed --class=DemoAttendanceSeeder
 ```
 
-### 7. Jalankan Server Laravel
+Seeder demo akan membuat:
+
+- Akun admin demo.
+- Data beberapa petugas.
+- Akun login petugas.
+- Contoh absensi bulan berjalan dan bulan sebelumnya.
+
+Akun admin demo:
+
+```text
+Email    : admin@demo.test
+Password : password123
+Role     : admin
+```
+
+Contoh akun petugas demo:
+
+```text
+Email    : andi@demo.test
+Password : password123
+Role     : employee
+```
+
+Alternatif akun petugas demo:
+
+```text
+Email    : ptg-001@demo.test
+Password : password123
+Role     : employee
+```
+
+### 11. Jalankan Server Laravel
+
+Jalankan:
 
 ```bash
 php artisan serve
 ```
 
-### 8. Jalankan Vite
+Biasanya aplikasi berjalan di:
+
+```text
+http://127.0.0.1:8000
+```
+
+Jika port `8000` sudah dipakai, gunakan port lain:
+
+```bash
+php artisan serve --port=8002
+```
+
+Lalu buka:
+
+```text
+http://127.0.0.1:8002
+```
+
+### 12. Jalankan Vite untuk Tampilan Frontend
+
+Buka terminal baru di folder project, lalu jalankan:
 
 ```bash
 npm run dev
 ```
 
-Aplikasi dapat dibuka melalui URL yang ditampilkan oleh Laravel, biasanya:
+Biarkan terminal ini tetap menyala selama development.
+
+### 13. Login dan Cek Aplikasi
+
+Buka halaman login:
 
 ```text
-http://127.0.0.1:8000
+http://127.0.0.1:8000/login
+```
+
+Login admin:
+
+```text
+Email    : test@example.com
+Password : password
+```
+
+atau admin demo:
+
+```text
+Email    : admin@demo.test
+Password : password123
+```
+
+Login petugas demo:
+
+```text
+Email    : andi@demo.test
+Password : password123
+```
+
+Setelah login:
+
+- Admin diarahkan ke halaman admin.
+- Petugas diarahkan ke halaman `/my-attendance`.
+
+### 14. Link Penting Setelah Project Jalan
+
+```text
+Login:
+http://127.0.0.1:8000/login
+
+Admin - Data Petugas:
+http://127.0.0.1:8000/employees
+
+Admin - Input Absensi:
+http://127.0.0.1:8000/attendances/create
+
+Admin - Laporan Bulanan:
+http://127.0.0.1:8000/reports/monthly
+
+Petugas - Absensi Saya:
+http://127.0.0.1:8000/my-attendance
+```
+
+### 15. Menjalankan Test
+
+Untuk memastikan aplikasi aman setelah clone, jalankan:
+
+```bash
+php artisan test
+```
+
+Jika semua aman, output akan menampilkan seluruh test `PASS`.
+
+### 16. Build Asset untuk Production
+
+Jika aplikasi akan disiapkan untuk production/staging:
+
+```bash
+npm run build
+```
+
+### 17. Troubleshooting Umum
+
+#### Error `APP_KEY` kosong
+
+Jalankan:
+
+```bash
+php artisan key:generate
+```
+
+#### Error database tidak ditemukan
+
+Pastikan database sudah dibuat di phpMyAdmin/MySQL dan nama di `.env` sama.
+
+Cek bagian ini:
+
+```env
+DB_DATABASE=absensibinhil
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+#### Perubahan `.env` tidak terbaca
+
+Jalankan:
+
+```bash
+php artisan config:clear
+php artisan cache:clear
+```
+
+#### Tabel belum ada
+
+Jalankan migration:
+
+```bash
+php artisan migrate
+```
+
+#### Ingin reset database dari awal
+
+Hati-hati: command ini menghapus dan membuat ulang semua tabel.
+
+```bash
+php artisan migrate:fresh --seed
+php artisan db:seed --class=DemoAttendanceSeeder
+```
+
+#### Tampilan CSS/JS tidak berubah
+
+Pastikan Vite berjalan:
+
+```bash
+npm run dev
+```
+
+Atau build ulang asset:
+
+```bash
+npm run build
 ```
 
 ## Perintah Penting

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Attendance;
 use App\Models\Employee;
+use App\Support\AttendanceStatus;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -53,7 +54,7 @@ class MarkAbsentAttendances extends Command
                             'date' => $date,
                             'check_in' => null,
                             'check_out' => null,
-                            'status' => 'absent',
+                            'status' => AttendanceStatus::ALPHA,
                             'late_minutes' => 0,
                         ]);
 

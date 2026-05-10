@@ -6,6 +6,7 @@
 @section('content')
 @php
     $todayDate = \Carbon\Carbon::parse($today);
+    $normalizedStatus = \App\Support\AttendanceStatus::normalized($attendance?->status);
     $statusClass = 'status-empty';
     $statusLabel = 'Belum Check-in';
     $actionType = 'check_in';
@@ -18,6 +19,11 @@
         $statusLabel = 'Hari Libur';
         $actionLabel = 'Hari ini libur';
         $actionDisabled = true;
+    } elseif ($attendance && ! \App\Support\AttendanceStatus::isPresent($normalizedStatus)) {
+        $statusClass = \App\Support\AttendanceStatus::badgeClass($normalizedStatus);
+        $statusLabel = \App\Support\AttendanceStatus::label($normalizedStatus);
+        $actionLabel = 'Status hari ini sudah dicatat';
+        $actionDisabled = true;
     } elseif ($attendance?->check_out) {
         $statusClass = $attendance->status === 'late' ? 'status-late' : 'status-on-time';
         $statusLabel = 'Sudah Check-out';
@@ -25,7 +31,7 @@
         $actionDisabled = true;
     } elseif ($attendance?->check_in) {
         $statusClass = $attendance->status === 'late' ? 'status-late' : 'status-on-time';
-        $statusLabel = $attendance->status === 'late' ? 'Terlambat' : 'Tepat Waktu';
+        $statusLabel = \App\Support\AttendanceStatus::label($attendance->status);
         $actionType = 'check_out';
         $actionLabel = 'Check Out Sekarang';
     }
@@ -394,7 +400,7 @@
                     @forelse($history as $row)
                         <tr>
                             <td>{{ $row->date->translatedFormat('d M Y') }}</td>
-                            <td>@if($row->status === 'on_time')<span class="status-badge status-on-time">Tepat Waktu</span>@elseif($row->status === 'late')<span class="status-badge status-late">Terlambat</span>@else<span class="status-badge status-absent">Tidak Hadir</span>@endif</td>
+                            <td><span class="status-badge {{ \App\Support\AttendanceStatus::badgeClass($row->status) }}">{{ \App\Support\AttendanceStatus::label($row->status) }}</span></td>
                             <td>{{ $row->check_in ? \Carbon\Carbon::parse($row->check_in)->format('H:i') : '--:--' }}</td>
                             <td>{{ $row->check_out ? \Carbon\Carbon::parse($row->check_out)->format('H:i') : '--:--' }}</td>
                             <td>{{ $row->late_minutes > 0 ? $row->late_minutes.' menit' : '-' }}</td>
@@ -411,13 +417,7 @@
                 <div class="mobile-history-card">
                     <div class="history-card-top">
                         <p class="history-date">{{ $row->date->translatedFormat('l, d M Y') }}</p>
-                        @if($row->status === 'on_time')
-                            <span class="status-badge status-on-time">Tepat Waktu</span>
-                        @elseif($row->status === 'late')
-                            <span class="status-badge status-late">Terlambat</span>
-                        @else
-                            <span class="status-badge status-absent">Tidak Hadir</span>
-                        @endif
+                        <span class="status-badge {{ \App\Support\AttendanceStatus::badgeClass($row->status) }}">{{ \App\Support\AttendanceStatus::label($row->status) }}</span>
                     </div>
                     <div class="history-detail-grid">
                         <div><p class="history-detail-label">Masuk</p><p class="history-detail-value">{{ $row->check_in ? \Carbon\Carbon::parse($row->check_in)->format('H:i') : '--:--' }}</p></div>

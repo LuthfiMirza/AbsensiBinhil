@@ -26,6 +26,9 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $this->call(WorkScheduleSeeder::class);
+        $this->call([
+            WorkScheduleSeeder::class,
+            InventorySeeder::class,
+        ]);
     }
 }

@@ -33,6 +33,9 @@ class MonthlyReportTest extends TestCase
         Attendance::create(['employee_id' => $blokA->id, 'date' => '2026-05-04', 'check_in' => '06:00:00', 'status' => 'on_time', 'late_minutes' => 0]);
         Attendance::create(['employee_id' => $blokA->id, 'date' => '2026-05-05', 'check_in' => '06:30:00', 'status' => 'late', 'late_minutes' => 30]);
         Attendance::create(['employee_id' => $blokA->id, 'date' => '2026-05-06', 'status' => 'absent', 'late_minutes' => 0]);
+        Attendance::create(['employee_id' => $blokA->id, 'date' => '2026-05-07', 'status' => 'permission', 'late_minutes' => 0]);
+        Attendance::create(['employee_id' => $blokA->id, 'date' => '2026-05-08', 'status' => 'sick', 'late_minutes' => 0]);
+        Attendance::create(['employee_id' => $blokA->id, 'date' => '2026-05-09', 'status' => 'holiday', 'late_minutes' => 0]);
         Attendance::create(['employee_id' => $blokB->id, 'date' => '2026-05-04', 'check_in' => '06:00:00', 'status' => 'on_time', 'late_minutes' => 0]);
 
         $response = $this->actingAs($user)->get('/reports/monthly?month=5&year=2026&area=Blok%20A');
@@ -45,6 +48,10 @@ class MonthlyReportTest extends TestCase
         $response->assertSee('>2<', false);
         $response->assertSee('>1<', false);
         $response->assertSee('30 menit');
+        $response->assertSee('Izin');
+        $response->assertSee('Sakit');
+        $response->assertSee('Alfa');
+        $response->assertSee('Libur');
     }
 
     public function test_monthly_report_handles_employee_without_attendance_and_ignores_sunday_records(): void

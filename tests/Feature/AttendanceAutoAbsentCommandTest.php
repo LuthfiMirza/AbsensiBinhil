@@ -28,7 +28,7 @@ class AttendanceAutoAbsentCommandTest extends TestCase
 
         $this->assertTrue(Attendance::where('employee_id', $employee->id)
             ->whereDate('date', '2026-05-07')
-            ->where('status', 'absent')
+            ->where('status', 'alpha')
             ->where('late_minutes', 0)
             ->exists());
     }
@@ -90,7 +90,7 @@ class AttendanceAutoAbsentCommandTest extends TestCase
         $this->assertSame(2, Attendance::whereDate('date', '2026-05-07')->count());
         $this->assertTrue(Attendance::where('employee_id', $employeeB->id)
             ->whereDate('date', '2026-05-07')
-            ->where('status', 'absent')
+            ->where('status', 'alpha')
             ->exists());
     }
 

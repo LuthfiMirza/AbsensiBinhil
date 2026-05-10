@@ -1,8 +1,12 @@
 <?php
 
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Employee\MyAttendanceController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\InventoryItemController;
+use App\Http\Controllers\InventoryReportController;
+use App\Http\Controllers\InventoryTransactionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
@@ -28,9 +32,14 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::middleware('admin')->group(function () {
-        Route::view('dashboard', 'dashboard')->name('dashboard');
+        Route::get('dashboard', DashboardController::class)->name('dashboard');
 
         Route::resource('employees', EmployeeController::class);
+
+        Route::resource('inventories', InventoryItemController::class)->except(['show']);
+        Route::resource('inventory-transactions', InventoryTransactionController::class)->only(['index', 'create', 'store']);
+        Route::get('inventory-reports/usage', [InventoryReportController::class, 'usage'])
+             ->name('inventory-reports.usage');
 
         Route::resource('attendances', AttendanceController::class)->only([
             'index', 'create', 'store'

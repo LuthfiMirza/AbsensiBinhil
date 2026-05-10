@@ -24,26 +24,16 @@
 </form>
 
 <div class="stats-grid">
-    <div class="stat-card" style="--accent:#5e6640;--accent-soft:#eef1e6;">
-        <p class="stat-label">Hadir</p>
-        <p class="stat-value">{{ $counter['hadir'] }}</p>
-        <p class="stat-note">petugas hadir</p>
-    </div>
-    <div class="stat-card" style="--accent:#4f7d45;--accent-soft:#edf5e9;">
-        <p class="stat-label">Tepat Waktu</p>
-        <p class="stat-value">{{ $counter['on_time'] }}</p>
-        <p class="stat-note">sesuai jadwal</p>
-    </div>
-    <div class="stat-card" style="--accent:#d99a25;--accent-soft:#fff4df;">
-        <p class="stat-label">Terlambat</p>
-        <p class="stat-value">{{ $counter['terlambat'] }}</p>
-        <p class="stat-note">melewati toleransi</p>
-    </div>
-    <div class="stat-card" style="--accent:#c0392b;--accent-soft:#fff0ee;">
-        <p class="stat-label">Belum Absen</p>
-        <p class="stat-value">{{ $counter['belum_absen'] }}</p>
-        <p class="stat-note">petugas aktif</p>
-    </div>
+    <div class="stat-card" style="--accent:#5e6640;--accent-soft:#eef1e6;"><p class="stat-label">Hadir</p><p class="stat-value">{{ $counter['hadir'] }}</p><p class="stat-note">termasuk terlambat</p></div>
+    <div class="stat-card" style="--accent:#d99a25;--accent-soft:#fff4df;"><p class="stat-label">Terlambat</p><p class="stat-value">{{ $counter['terlambat'] }}</p><p class="stat-note">melewati toleransi</p></div>
+    <div class="stat-card" style="--accent:#3d6f82;--accent-soft:#eef3f6;"><p class="stat-label">Izin</p><p class="stat-value">{{ $counter['izin'] }}</p><p class="stat-note">dengan keterangan</p></div>
+    <div class="stat-card" style="--accent:#6f5b84;--accent-soft:#f1eef6;"><p class="stat-label">Sakit</p><p class="stat-value">{{ $counter['sakit'] }}</p><p class="stat-note">tidak masuk sakit</p></div>
+</div>
+<div class="stats-grid">
+    <div class="stat-card" style="--accent:#c0392b;--accent-soft:#fff0ee;"><p class="stat-label">Alfa</p><p class="stat-value">{{ $counter['alfa'] }}</p><p class="stat-note">tanpa keterangan</p></div>
+    <div class="stat-card" style="--accent:#77776f;--accent-soft:#efefea;"><p class="stat-label">Libur</p><p class="stat-value">{{ $counter['libur'] }}</p><p class="stat-note">tidak dihitung kerja</p></div>
+    <div class="stat-card" style="--accent:#4f7d45;--accent-soft:#edf5e9;"><p class="stat-label">Tepat Waktu</p><p class="stat-value">{{ $counter['on_time'] }}</p><p class="stat-note">sesuai jadwal</p></div>
+    <div class="stat-card" style="--accent:#c0392b;--accent-soft:#fff0ee;"><p class="stat-label">Belum Absen</p><p class="stat-value">{{ $counter['belum_absen'] }}</p><p class="stat-note">petugas aktif</p></div>
 </div>
 
 <div class="table-card">
@@ -80,13 +70,7 @@
                         <td>{{ $att->check_in ? \Carbon\Carbon::parse($att->check_in)->format('H:i') : '--:--' }}</td>
                         <td>{{ $att->check_out ? \Carbon\Carbon::parse($att->check_out)->format('H:i') : '--:--' }}</td>
                         <td>
-                            @if($att->status === 'on_time')
-                                <span class="status-badge status-on-time">Tepat Waktu</span>
-                            @elseif($att->status === 'late')
-                                <span class="status-badge status-late">Terlambat</span>
-                            @else
-                                <span class="status-badge status-absent">Tidak Hadir</span>
-                            @endif
+                            <span class="status-badge {{ \App\Support\AttendanceStatus::badgeClass($att->status) }}">{{ \App\Support\AttendanceStatus::label($att->status) }}</span>
                         </td>
                         <td>{{ $att->late_minutes > 0 ? $att->late_minutes.' menit' : '-' }}</td>
                     </tr>

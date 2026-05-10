@@ -102,8 +102,8 @@
         <div class="card form-card">
             <div class="table-header" style="padding:0 0 18px;margin-bottom:22px;">
                 <div>
-                    <h3>Tandai Tidak Hadir</h3>
-                    <p>Gunakan untuk mencatat izin, sakit, atau petugas tidak masuk.</p>
+                    <h3>Catat Izin / Sakit / Alfa / Libur</h3>
+                    <p>Status ini tidak membutuhkan jam masuk dan jam pulang.</p>
                 </div>
             </div>
 
@@ -124,12 +124,21 @@
                         <input id="date" type="date" name="date" value="{{ date('Y-m-d') }}" required class="form-control">
                     </div>
                     <div class="form-field">
+                        <label for="status">Status</label>
+                        <select id="status" name="status" required class="form-control">
+                            <option value="permission">Izin</option>
+                            <option value="sick">Sakit</option>
+                            <option value="alpha">Alfa</option>
+                            <option value="holiday">Libur</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
                         <label for="notes">Keterangan</label>
-                        <input id="notes" type="text" name="notes" placeholder="Sakit, izin, dll..." class="form-control">
+                        <input id="notes" type="text" name="notes" placeholder="Contoh: surat izin, sakit, jadwal libur area..." class="form-control">
                     </div>
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="btn-danger">Tandai Tidak Hadir</button>
+                    <button type="submit" class="btn-primary">Simpan Status</button>
                 </div>
             </form>
         </div>

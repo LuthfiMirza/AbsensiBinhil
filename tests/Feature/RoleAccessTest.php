@@ -55,12 +55,16 @@ class RoleAccessTest extends TestCase
         $this->actingAs($user)->get('/my-attendance')->assertOk()->assertSee('Petugas Role');
 
         foreach ([
+            '/dashboard',
             '/attendances',
             '/attendances/create',
             '/employees',
             '/employees/create',
             '/reports/monthly',
             '/reports/monthly/export',
+            '/inventories',
+            '/inventory-transactions',
+            '/inventory-reports/usage',
         ] as $adminPath) {
             $this->actingAs($user)->get($adminPath)->assertForbidden();
         }
@@ -68,6 +72,7 @@ class RoleAccessTest extends TestCase
 
     public function test_employee_check_in_uses_own_employee_id_and_ignores_posted_employee_id(): void
     {
+        Carbon::setTestNow('2026-05-08 08:00:00');
         $ownEmployee = Employee::create([
             'name' => 'Petugas Sendiri',
             'employee_code' => 'OWN-001',
@@ -94,6 +99,7 @@ class RoleAccessTest extends TestCase
 
         $this->assertTrue(Attendance::where('employee_id', $ownEmployee->id)->whereDate('date', today())->exists());
         $this->assertFalse(Attendance::where('employee_id', $otherEmployee->id)->whereDate('date', today())->exists());
+        Carbon::setTestNow();
     }
 
 
@@ -199,13 +205,49 @@ class RoleAccessTest extends TestCase
         Carbon::setTestNow();
     }
 
+    public function test_employee_my_attendance_displays_new_status_labels(): void
+    {
+        Carbon::setTestNow('2026-05-08 08:00:00');
+        $employee = Employee::create([
+            'name' => 'Petugas Status Baru',
+            'employee_code' => 'NEW-001',
+            'area' => 'Blok A',
+            'shift' => 'pagi',
+            'is_active' => true,
+        ]);
+        $user = User::factory()->create([
+            'role' => 'employee',
+            'employee_id' => $employee->id,
+        ]);
+
+        foreach (['on_time', 'late', 'permission', 'sick', 'alpha', 'holiday', 'absent'] as $index => $status) {
+            Attendance::create([
+                'employee_id' => $employee->id,
+                'date' => Carbon::parse('2026-05-01')->addDays($index)->toDateString(),
+                'status' => $status,
+                'late_minutes' => $status === 'late' ? 10 : 0,
+            ]);
+        }
+
+        $this->actingAs($user)->get('/my-attendance')
+            ->assertOk()
+            ->assertSee('Hadir')
+            ->assertSee('Terlambat')
+            ->assertSee('Izin')
+            ->assertSee('Sakit')
+            ->assertSee('Alfa')
+            ->assertSee('Libur');
+
+        Carbon::setTestNow();
+    }
+
     public function test_seeders_create_admin_and_employee_accounts_without_duplicates(): void
     {
         $this->seed(\Database\Seeders\DemoAttendanceSeeder::class);
         $this->seed(\Database\Seeders\DemoAttendanceSeeder::class);
 
         $this->assertSame(1, User::where('email', 'admin@demo.test')->where('role', 'admin')->count());
-        $this->assertSame(16, User::where('role', 'employee')->whereNotNull('employee_id')->count());
+        $this->assertSame(40, User::where('role', 'employee')->whereNotNull('employee_id')->count());
         $this->assertSame(1, User::where('email', 'andi@demo.test')->where('role', 'employee')->count());
         $this->assertSame(1, User::where('email', 'ptg-001@demo.test')->where('role', 'employee')->count());
     }

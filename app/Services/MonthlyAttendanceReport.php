@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Attendance;
 use App\Models\Employee;
+use App\Support\AttendanceStatus;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Collection;
@@ -31,7 +32,7 @@ class MonthlyAttendanceReport
 
     public function employees(int $month, int $year, ?string $area = null): Collection
     {
-        $workingDays = $this->workingDays($month, $year);
+        $baseWorkingDays = $this->workingDays($month, $year);
 
         return Employee::query()
             ->where('is_active', true)
@@ -40,23 +41,18 @@ class MonthlyAttendanceReport
                 $query->whereMonth('date', $month)->whereYear('date', $year);
             }])
             ->get()
-            ->map(function (Employee $employee) use ($workingDays) {
+            ->map(function (Employee $employee) use ($baseWorkingDays) {
                 $attendances = $employee->attendances->filter(
                     fn (Attendance $attendance) => $this->isWorkingDay($attendance->date)
                 );
+                $summary = $this->summary($attendances, $baseWorkingDays);
 
-                return [
+                return array_merge([
                     'id' => $employee->id,
                     'name' => $employee->name,
                     'area' => $employee->area,
                     'shift' => $employee->shift,
-                    'hadir' => $attendances->whereNotIn('status', ['absent'])->count(),
-                    'on_time' => $attendances->where('status', 'on_time')->count(),
-                    'terlambat' => $attendances->where('status', 'late')->count(),
-                    'tidak_hadir' => $attendances->where('status', 'absent')->count(),
-                    'avg_terlambat' => round($attendances->where('late_minutes', '>', 0)->avg('late_minutes') ?? 0, 1),
-                    'skor' => $this->score($attendances, $workingDays),
-                ];
+                ], $summary);
             })
             ->sortByDesc('skor')
             ->values();
@@ -75,13 +71,20 @@ class MonthlyAttendanceReport
             Carbon::createFromDate($year, $month, 1)->endOfMonth()->startOfDay()
         ))->map(function (Carbon $date) use ($employee, $attendances) {
             $attendance = $attendances->get($date->toDateString());
+            $status = $attendance?->status;
+
+            if (! $this->isWorkingDay($date) && ! $status) {
+                $status = AttendanceStatus::HOLIDAY;
+            }
 
             return [
                 'date' => $date->copy(),
                 'area' => $employee->area,
                 'is_working_day' => $this->isWorkingDay($date),
                 'attendance' => $attendance,
-                'status' => $attendance?->status,
+                'status' => $status,
+                'status_label' => AttendanceStatus::label($status),
+                'status_class' => AttendanceStatus::badgeClass($status),
                 'check_in' => $attendance?->check_in,
                 'check_out' => $attendance?->check_out,
                 'late_minutes' => $attendance?->late_minutes ?? 0,
@@ -102,15 +105,46 @@ class MonthlyAttendanceReport
         return ! $date->isSunday();
     }
 
-    public function score(Collection $attendances, int $workingDays): float
+    public function summary(Collection $attendances, int $baseWorkingDays): array
+    {
+        $hadir = $attendances->filter(fn (Attendance $attendance) => AttendanceStatus::isPresent($attendance->status))->count();
+        $onTime = $attendances->where('status', AttendanceStatus::ON_TIME)->count();
+        $late = $attendances->where('status', AttendanceStatus::LATE)->count();
+        $permission = $attendances->where('status', AttendanceStatus::PERMISSION)->count();
+        $sick = $attendances->where('status', AttendanceStatus::SICK)->count();
+        $alpha = $attendances->filter(fn (Attendance $attendance) => AttendanceStatus::isAlpha($attendance->status))->count();
+        $holiday = $attendances->where('status', AttendanceStatus::HOLIDAY)->count();
+        $effectiveWorkingDays = max($baseWorkingDays - $holiday, 0);
+        $recorded = $hadir + $permission + $sick + $alpha + $holiday;
+        $noData = max($effectiveWorkingDays - ($hadir + $permission + $sick + $alpha), 0);
+
+        return [
+            'hadir' => $hadir,
+            'on_time' => $onTime,
+            'terlambat' => $late,
+            'izin' => $permission,
+            'sakit' => $sick,
+            'alfa' => $alpha,
+            'libur' => $holiday,
+            'tidak_hadir' => $alpha,
+            'belum_ada_data' => $noData,
+            'recorded' => $recorded,
+            'avg_terlambat' => round($attendances->where('late_minutes', '>', 0)->avg('late_minutes') ?? 0, 1),
+            'skor' => $this->score($hadir, $onTime, $permission, $sick, $alpha, $noData, $effectiveWorkingDays),
+        ];
+    }
+
+    public function score(int $hadir, int $onTime, int $permission, int $sick, int $alpha, int $noData, int $workingDays): float
     {
         if ($workingDays === 0) {
             return 0;
         }
 
-        $hadir = $attendances->whereNotIn('status', ['absent'])->count();
-        $onTime = $attendances->where('status', 'on_time')->count();
+        $attendanceCredit = $hadir + ($permission * 0.75) + ($sick * 0.85);
+        $attendanceScore = min(($attendanceCredit / $workingDays) * 70, 70);
+        $punctualityScore = $hadir > 0 ? ($onTime / $hadir) * 30 : 0;
+        $penalty = ($alpha * 5) + ($noData * 3);
 
-        return round((($hadir / $workingDays) * 70) + (($onTime / max($hadir, 1)) * 30), 1);
+        return round(max($attendanceScore + $punctualityScore - $penalty, 0), 1);
     }
 }

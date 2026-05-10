@@ -1,0 +1,8 @@
+<div class="form-field" style="margin-bottom:16px;"><label for="name">Nama Barang</label><input id="name" name="name" class="form-control" value="{{ old('name', $item?->name) }}" required>@error('name')<p class="field-error">{{ $message }}</p>@enderror</div>
+<div class="filter-grid" style="margin-bottom:16px;align-items:start;">
+    <div class="form-field"><label for="unit">Satuan</label><input id="unit" name="unit" class="form-control" value="{{ old('unit', $item?->unit ?? 'pcs') }}" required>@error('unit')<p class="field-error">{{ $message }}</p>@enderror</div>
+    <div class="form-field"><label for="minimum_stock">Minimum Stok</label><input id="minimum_stock" name="minimum_stock" type="number" min="0" class="form-control" value="{{ old('minimum_stock', $item?->minimum_stock ?? 0) }}" required>@error('minimum_stock')<p class="field-error">{{ $message }}</p>@enderror</div>
+</div>
+<div class="form-field" style="margin-bottom:16px;"><label for="description">Catatan</label><textarea id="description" name="description" class="form-control" style="min-height:100px;padding-top:12px;">{{ old('description', $item?->description) }}</textarea>@error('description')<p class="field-error">{{ $message }}</p>@enderror</div>
+<label style="display:flex;gap:10px;align-items:center;margin-bottom:18px;"><input type="checkbox" name="is_active" value="1" {{ old('is_active', $item?->is_active ?? true) ? 'checked' : '' }} style="accent-color:var(--color-primary);"> <span>Barang aktif</span></label>
+<div class="form-actions"><button class="btn-primary" type="submit">Simpan Barang</button><a href="{{ route('inventories.index') }}" class="btn-secondary">Batal</a></div>

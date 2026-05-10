@@ -85,6 +85,8 @@
         .status-on-time, .score-high { background: #edf5e9; color: var(--color-success); }
         .status-late, .score-mid { background: #fff4df; color: var(--color-warning); }
         .status-absent, .score-low { background: #fff0ee; color: var(--color-danger); }
+        .status-permission { background: #eef3f6; color: #3d6f82; }
+        .status-sick { background: #f1eef6; color: #6f5b84; }
         .status-empty, .status-holiday { background: #efefea; color: #77776f; }
         .area-badge { background: var(--color-primary-soft); color: var(--color-primary); }
         .alert { margin-bottom: 18px; padding: 14px 16px; border-radius: 16px; border: 1px solid var(--color-border); background: #fff; font-size: 14px; }
@@ -159,6 +161,10 @@
             <a href="{{ route('reports.monthly') }}" class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
                 <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 19V9m7 10V5m7 14v-7" /></svg>
                 Laporan Bulanan
+            </a>
+            <a href="{{ route('inventories.index') }}" class="nav-link {{ request()->routeIs('inventories.*') || request()->routeIs('inventory-transactions.*') || request()->routeIs('inventory-reports.*') ? 'active' : '' }}">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.75 7.5l7.25-3.25 7.25 3.25M4.75 7.5v8.75L12 20l7.25-3.75V7.5M4.75 7.5L12 11.25m7.25-3.75L12 11.25m0 0V20" /></svg>
+                Inventaris
             </a>
             @endif
         </nav>

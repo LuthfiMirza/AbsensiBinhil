@@ -8,7 +8,9 @@
     $totalPetugas = $employees->count();
     $avgScore = $totalPetugas ? round($employees->avg('skor'), 1) : 0;
     $totalLate = $employees->sum('terlambat');
-    $totalAbsent = $employees->sum('tidak_hadir');
+    $totalAbsent = $employees->sum('alfa');
+    $totalPermission = $employees->sum('izin');
+    $totalSick = $employees->sum('sakit');
 @endphp
 
 <div class="page-header">
@@ -54,7 +56,13 @@
     <div class="stat-card" style="--accent:#5e6640;--accent-soft:#eef1e6;"><p class="stat-label">Total Petugas</p><p class="stat-value">{{ $totalPetugas }}</p><p class="stat-note">dalam filter</p></div>
     <div class="stat-card" style="--accent:#4f7d45;--accent-soft:#edf5e9;"><p class="stat-label">Rata-rata Skor</p><p class="stat-value">{{ $avgScore }}</p><p class="stat-note">performa</p></div>
     <div class="stat-card" style="--accent:#d99a25;--accent-soft:#fff4df;"><p class="stat-label">Total Terlambat</p><p class="stat-value">{{ $totalLate }}</p><p class="stat-note">kejadian</p></div>
-    <div class="stat-card" style="--accent:#c0392b;--accent-soft:#fff0ee;"><p class="stat-label">Tidak Hadir</p><p class="stat-value">{{ $totalAbsent }}</p><p class="stat-note">record absent</p></div>
+    <div class="stat-card" style="--accent:#c0392b;--accent-soft:#fff0ee;"><p class="stat-label">Total Alfa</p><p class="stat-value">{{ $totalAbsent }}</p><p class="stat-note">tanpa keterangan</p></div>
+</div>
+<div class="stats-grid">
+    <div class="stat-card" style="--accent:#3d6f82;--accent-soft:#eef3f6;"><p class="stat-label">Total Izin</p><p class="stat-value">{{ $totalPermission }}</p><p class="stat-note">izin tercatat</p></div>
+    <div class="stat-card" style="--accent:#6f5b84;--accent-soft:#f1eef6;"><p class="stat-label">Total Sakit</p><p class="stat-value">{{ $totalSick }}</p><p class="stat-note">sakit tercatat</p></div>
+    <div class="stat-card" style="--accent:#77776f;--accent-soft:#efefea;"><p class="stat-label">Libur Khusus</p><p class="stat-value">{{ $employees->sum('libur') }}</p><p class="stat-note">tidak menurunkan skor</p></div>
+    <div class="stat-card" style="--accent:#77776f;--accent-soft:#efefea;"><p class="stat-label">Belum Ada Data</p><p class="stat-value">{{ $employees->sum('belum_ada_data') }}</p><p class="stat-note">hari kerja kosong</p></div>
 </div>
 
 <div class="card" style="margin-bottom:22px;">
@@ -79,7 +87,11 @@
                     <th>Hadir</th>
                     <th>Tepat Waktu</th>
                     <th>Terlambat</th>
-                    <th>Tidak Hadir</th>
+                    <th>Izin</th>
+                    <th>Sakit</th>
+                    <th>Alfa</th>
+                    <th>Libur</th>
+                    <th>Belum Data</th>
                     <th>Avg. Telat</th>
                     <th>Skor</th>
                     <th>Aksi</th>
@@ -95,13 +107,17 @@
                         <td>{{ $emp['hadir'] }}</td>
                         <td><span class="status-badge status-on-time">{{ $emp['on_time'] }}</span></td>
                         <td><span class="status-badge status-late">{{ $emp['terlambat'] }}</span></td>
-                        <td><span class="status-badge status-absent">{{ $emp['tidak_hadir'] }}</span></td>
+                        <td><span class="status-badge status-permission">{{ $emp['izin'] }}</span></td>
+                        <td><span class="status-badge status-sick">{{ $emp['sakit'] }}</span></td>
+                        <td><span class="status-badge status-absent">{{ $emp['alfa'] }}</span></td>
+                        <td><span class="status-badge status-holiday">{{ $emp['libur'] }}</span></td>
+                        <td><span class="status-badge status-empty">{{ $emp['belum_ada_data'] }}</span></td>
                         <td>{{ $emp['avg_terlambat'] > 0 ? $emp['avg_terlambat'].' menit' : '-' }}</td>
                         <td><span class="score-badge {{ $scoreClass }}">{{ $emp['skor'] }}</span></td>
                         <td><a href="{{ route('reports.monthly.detail', ['employee' => $emp['id'], 'month' => $month, 'year' => $year]) }}" class="btn-link-soft">Lihat Detail</a></td>
                     </tr>
                 @empty
-                    <tr><td colspan="10" class="text-muted" style="text-align:center;padding:42px;">Belum ada data petugas untuk filter ini.</td></tr>
+                    <tr><td colspan="14" class="text-muted" style="text-align:center;padding:42px;">Belum ada data petugas untuk filter ini.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -119,7 +135,9 @@ if (ctx) {
                 { label: 'Hadir', data: @json($employees->pluck('hadir')), backgroundColor: '#5e6640' },
                 { label: 'Tepat Waktu', data: @json($employees->pluck('on_time')), backgroundColor: '#4f7d45' },
                 { label: 'Terlambat', data: @json($employees->pluck('terlambat')), backgroundColor: '#d99a25' },
-                { label: 'Tidak Hadir', data: @json($employees->pluck('tidak_hadir')), backgroundColor: '#c0392b' }
+                { label: 'Izin', data: @json($employees->pluck('izin')), backgroundColor: '#3d6f82' },
+                { label: 'Sakit', data: @json($employees->pluck('sakit')), backgroundColor: '#6f5b84' },
+                { label: 'Alfa', data: @json($employees->pluck('alfa')), backgroundColor: '#c0392b' }
             ]
         },
         options: { responsive: true, plugins: { legend: { labels: { boxWidth: 12 } } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }

@@ -36,9 +36,9 @@ class MonthlyDetailTest extends TestCase
         $response->assertOk();
         $response->assertSee('01 May 2026');
         $response->assertSee('31 May 2026');
-        $response->assertSee('Tepat Waktu');
+        $response->assertSee('Hadir');
         $response->assertSee('Terlambat');
-        $response->assertSee('Tidak Hadir');
+        $response->assertSee('Alfa');
         $response->assertSee('Belum Ada Data');
         $response->assertSee('Libur');
         $response->assertSee('20 menit');

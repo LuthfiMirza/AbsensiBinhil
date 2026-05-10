@@ -17,7 +17,7 @@ return new class extends Migration
         $table->date('date');
         $table->time('check_in')->nullable();
         $table->time('check_out')->nullable();
-        $table->enum('status', ['on_time', 'late', 'absent'])->default('on_time');
+        $table->enum('status', ['on_time', 'late', 'absent', 'permission', 'sick', 'alpha', 'holiday'])->default('on_time');
         $table->integer('late_minutes')->default(0);
         $table->text('notes')->nullable();
         $table->unique(['employee_id', 'date']); // 1 record per orang per hari

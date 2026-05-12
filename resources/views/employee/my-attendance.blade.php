@@ -385,6 +385,30 @@
         </p>
     </div>
 
+    <div class="card action-card">
+        <div class="table-header" style="padding:0;margin-bottom:16px;">
+            <div>
+                <h3>Tugas Hari Ini</h3>
+                <p>
+                    @if($taskSummary['total'] === 0)
+                        Belum ada tugas untuk hari ini.
+                    @elseif($taskSummary['completed'] === $taskSummary['total'])
+                        Semua tugas selesai. Terima kasih.
+                    @else
+                        {{ $taskSummary['completed'] }} dari {{ $taskSummary['total'] }} tugas selesai, {{ $taskSummary['pending'] + $taskSummary['in_progress'] }} belum selesai.
+                    @endif
+                </p>
+            </div>
+        </div>
+        <div class="attendance-info-grid" style="margin-bottom:16px;">
+            <div class="card info-card"><p class="info-label">Total</p><p class="info-value">{{ $taskSummary['total'] }}</p></div>
+            <div class="card info-card"><p class="info-label">Selesai</p><p class="info-value">{{ $taskSummary['completed'] }}</p></div>
+            <div class="card info-card"><p class="info-label">Proses</p><p class="info-value">{{ $taskSummary['in_progress'] }}</p></div>
+            <div class="card info-card"><p class="info-label">Belum</p><p class="info-value">{{ $taskSummary['pending'] }}</p></div>
+        </div>
+        <a href="{{ route('my-tasks.index') }}" class="btn-primary" style="width:100%;">Lihat Tugas Saya</a>
+    </div>
+
     <div class="table-card">
         <div class="table-header">
             <div>

@@ -15,6 +15,11 @@ class Employee extends Model
         return $this->hasMany(Attendance::class);
     }
 
+    public function dailyTasks()
+    {
+        return $this->hasMany(DailyTask::class);
+    }
+
     public function user()
     {
         return $this->hasOne(User::class);

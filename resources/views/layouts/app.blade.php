@@ -141,6 +141,10 @@
                 <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3.75M16 7V3.75M4.75 9.25h14.5M6.5 5.75h11A1.75 1.75 0 0119.25 7.5v10.25A1.75 1.75 0 0117.5 19.5h-11a1.75 1.75 0 01-1.75-1.75V7.5A1.75 1.75 0 016.5 5.75z" /></svg>
                 Absensi Saya
             </a>
+            <a href="{{ route('my-tasks.index') }}" class="nav-link {{ request()->routeIs('my-tasks.*') ? 'active' : '' }}">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h11M8.25 12h11M8.25 17.25h11M4.75 6.75h.01M4.75 12h.01M4.75 17.25h.01" /></svg>
+                Tugas Saya
+            </a>
             @else
             <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12l8.25-7.5 8.25 7.5M5.25 10.5v8.25h4.5v-5.25h4.5v5.25h4.5V10.5" /></svg>
@@ -157,6 +161,14 @@
             <a href="{{ route('employees.index') }}" class="nav-link {{ request()->routeIs('employees.*') ? 'active' : '' }}">
                 <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 7.5a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a8.25 8.25 0 1115 0" /></svg>
                 Data Petugas
+            </a>
+            <a href="{{ route('task-templates.index') }}" class="nav-link {{ request()->routeIs('task-templates.*') ? 'active' : '' }}">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h11M8.25 12h11M8.25 17.25h11M4.75 6.75h.01M4.75 12h.01M4.75 17.25h.01" /></svg>
+                Master Tugas
+            </a>
+            <a href="{{ route('daily-tasks.index') }}" class="nav-link {{ request()->routeIs('daily-tasks.*') ? 'active' : '' }}">
+                <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 4.75h10.5A1.75 1.75 0 0119 6.5v11a1.75 1.75 0 01-1.75 1.75H6.75A1.75 1.75 0 015 17.5v-11a1.75 1.75 0 011.75-1.75zM8.5 9h7M8.5 12h7M8.5 15h4" /></svg>
+                Tugas Harian
             </a>
             <a href="{{ route('reports.monthly') }}" class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
                 <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 19V9m7 10V5m7 14v-7" /></svg>

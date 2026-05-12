@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
+use App\Models\DailyTask;
 use App\Models\WorkSchedule;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -30,7 +31,18 @@ class MyAttendanceController extends Controller
             ->limit(15)
             ->get();
 
-        return view('employee.my-attendance', compact('employee', 'today', 'attendance', 'history', 'isHoliday'));
+        $todayTasks = DailyTask::query()
+            ->where('employee_id', $employee->id)
+            ->whereDate('task_date', $today)
+            ->get();
+        $taskSummary = [
+            'total' => $todayTasks->count(),
+            'completed' => $todayTasks->where('status', DailyTask::STATUS_COMPLETED)->count(),
+            'in_progress' => $todayTasks->where('status', DailyTask::STATUS_IN_PROGRESS)->count(),
+            'pending' => $todayTasks->where('status', DailyTask::STATUS_PENDING)->count(),
+        ];
+
+        return view('employee.my-attendance', compact('employee', 'today', 'attendance', 'history', 'isHoliday', 'taskSummary'));
     }
 
     public function store(Request $request): RedirectResponse

@@ -54,6 +54,16 @@ class User extends Authenticatable
         return $this->belongsTo(Employee::class);
     }
 
+    public function assignedDailyTasks()
+    {
+        return $this->hasMany(DailyTask::class, 'assigned_by');
+    }
+
+    public function completedDailyTasks()
+    {
+        return $this->hasMany(DailyTask::class, 'completed_by');
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';

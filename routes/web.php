@@ -1,14 +1,17 @@
 <?php
 
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\DailyTaskController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Employee\MyAttendanceController;
+use App\Http\Controllers\Employee\MyTaskController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\InventoryItemController;
 use App\Http\Controllers\InventoryReportController;
 use App\Http\Controllers\InventoryTransactionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\TaskTemplateController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -29,12 +32,20 @@ Route::middleware('auth')->group(function () {
     Route::middleware('employee')->group(function () {
         Route::get('my-attendance', [MyAttendanceController::class, 'index'])->name('my-attendance.index');
         Route::post('my-attendance', [MyAttendanceController::class, 'store'])->name('my-attendance.store');
+        Route::get('my-tasks', [MyTaskController::class, 'index'])->name('my-tasks.index');
+        Route::post('my-tasks/{dailyTask}/start', [MyTaskController::class, 'start'])->name('my-tasks.start');
+        Route::post('my-tasks/{dailyTask}/complete', [MyTaskController::class, 'complete'])->name('my-tasks.complete');
     });
 
     Route::middleware('admin')->group(function () {
         Route::get('dashboard', DashboardController::class)->name('dashboard');
 
         Route::resource('employees', EmployeeController::class);
+
+        Route::resource('task-templates', TaskTemplateController::class)->except(['show']);
+        Route::resource('daily-tasks', DailyTaskController::class)->except(['show']);
+        Route::post('daily-tasks/{dailyTask}/mark-completed', [DailyTaskController::class, 'markCompleted'])
+             ->name('daily-tasks.mark-completed');
 
         Route::resource('inventories', InventoryItemController::class)->except(['show']);
         Route::resource('inventory-transactions', InventoryTransactionController::class)->only(['index', 'create', 'store']);

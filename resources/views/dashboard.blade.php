@@ -43,6 +43,18 @@
     <a href="{{ route('inventories.index') }}" class="stat-card" style="text-decoration:none;--accent:#c0392b;--accent-soft:#fff0ee;"><p class="stat-label">Stok Barang Rendah</p><p class="stat-value">{{ $lowStockItems->count() }}</p><p class="stat-note">{{ $lowStockItems->isEmpty() ? 'Semua stok aman' : $lowStockItems->take(2)->pluck('name')->join(', ') }}</p></a>
 </div>
 
+<div class="stats-grid">
+    <a href="{{ route('daily-tasks.index', ['task_date' => $today->toDateString()]) }}" class="stat-card" style="text-decoration:none;--accent:#5e6640;--accent-soft:#eef1e6;"><p class="stat-label">Total Tugas Hari Ini</p><p class="stat-value">{{ $taskSummary['total'] }}</p><p class="stat-note">assignment aktif hari ini</p></a>
+    <div class="stat-card" style="--accent:#4f7d45;--accent-soft:#edf5e9;"><p class="stat-label">Tugas Selesai</p><p class="stat-value">{{ $taskSummary['completed'] }}</p><p class="stat-note">{{ $taskSummary['completion_rate'] }}% selesai</p></div>
+    <div class="stat-card" style="--accent:#d99a25;--accent-soft:#fff4df;"><p class="stat-label">Sedang Dikerjakan</p><p class="stat-value">{{ $taskSummary['in_progress'] }}</p><p class="stat-note">sudah mulai</p></div>
+    <div class="stat-card" style="--accent:#c0392b;--accent-soft:#fff0ee;"><p class="stat-label">Belum Dikerjakan</p><p class="stat-value">{{ $taskSummary['pending'] }}</p><p class="stat-note">perlu follow up</p></div>
+</div>
+
+<div class="table-card" style="margin-bottom:22px;">
+    <div class="table-header"><div><h3>Tugas Belum Selesai Terbanyak</h3><p>Petugas yang perlu dipantau hari ini.</p></div><a href="{{ route('daily-tasks.index') }}" class="btn-secondary">Lihat Tugas</a></div>
+    <div class="table-responsive"><table class="app-table"><thead><tr><th>Petugas</th><th>Area</th><th>Belum Selesai</th></tr></thead><tbody>@forelse($unfinishedTaskEmployees as $row)<tr><td><strong>{{ $row['employee']?->name }}</strong></td><td>{{ $row['employee']?->area ?: '-' }}</td><td>{{ $row['count'] }} tugas</td></tr>@empty<tr><td colspan="3" class="text-muted" style="text-align:center;padding:26px;">Belum ada tugas tertunda hari ini.</td></tr>@endforelse</tbody></table></div>
+</div>
+
 <div class="card">
     <div class="table-header" style="padding:0;">
         <div><h3>Quick Actions</h3><p>Akses cepat untuk aktivitas koordinator.</p></div>

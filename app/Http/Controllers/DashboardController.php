@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use App\Models\DailyTask;
 use App\Models\Employee;
 use App\Models\InventoryItem;
 use App\Services\MonthlyAttendanceReport;
@@ -42,7 +43,23 @@ class DashboardController extends Controller
 
         $lowStockItems = InventoryItem::query()->with('transactions')->where('is_active', true)->orderBy('name')->get()->filter->is_low_stock->values();
 
-        return view('dashboard', compact('today', 'todaySummary', 'monthSummary', 'quarterSummary', 'lowStockItems'));
+        $todayTasks = DailyTask::query()->with('employee')->whereDate('task_date', $today)->get();
+        $taskSummary = [
+            'total' => $todayTasks->count(),
+            'completed' => $todayTasks->where('status', DailyTask::STATUS_COMPLETED)->count(),
+            'in_progress' => $todayTasks->where('status', DailyTask::STATUS_IN_PROGRESS)->count(),
+            'pending' => $todayTasks->where('status', DailyTask::STATUS_PENDING)->count(),
+        ];
+        $taskSummary['completion_rate'] = $taskSummary['total'] > 0 ? round(($taskSummary['completed'] / $taskSummary['total']) * 100) : 0;
+        $unfinishedTaskEmployees = $todayTasks
+            ->where('status', '!=', DailyTask::STATUS_COMPLETED)
+            ->groupBy('employee_id')
+            ->map(fn ($tasks) => ['employee' => $tasks->first()->employee, 'count' => $tasks->count()])
+            ->sortByDesc('count')
+            ->take(5)
+            ->values();
+
+        return view('dashboard', compact('today', 'todaySummary', 'monthSummary', 'quarterSummary', 'lowStockItems', 'taskSummary', 'unfinishedTaskEmployees'));
     }
 
     private function summarize(Collection $attendances): array

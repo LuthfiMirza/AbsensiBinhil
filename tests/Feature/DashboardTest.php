@@ -50,4 +50,18 @@ class DashboardTest extends TestCase
 
         Carbon::setTestNow();
     }
+
+    public function test_admin_dashboard_shows_task_summary_without_tasks(): void
+    {
+        Carbon::setTestNow('2026-05-12 09:00:00');
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $response = $this->actingAs($admin)->get('/dashboard');
+
+        $response->assertOk();
+        $response->assertSee('Total Tugas Hari Ini');
+        $response->assertSee('Belum ada tugas tertunda hari ini');
+
+        Carbon::setTestNow();
+    }
 }

@@ -1,0 +1,17 @@
+@csrf
+<div class="card">
+    <div class="filter-grid">
+        <div class="form-field"><label>Tanggal</label><input type="date" name="task_date" value="{{ old('task_date', optional($dailyTask->task_date)->format('Y-m-d') ?? today()->toDateString()) }}" class="form-control" required>@error('task_date')<p class="field-error">{{ $message }}</p>@enderror</div>
+        <div class="form-field" style="flex:1;min-width:230px;"><label>Petugas</label><select name="employee_id" class="form-control" required><option value="">Pilih Petugas</option>@foreach($employees as $employee)<option value="{{ $employee->id }}" @selected(old('employee_id', $dailyTask->employee_id) == $employee->id)>{{ $employee->name }} — {{ $employee->area }}</option>@endforeach</select>@error('employee_id')<p class="field-error">{{ $message }}</p>@enderror</div>
+        <div class="form-field" style="flex:1;min-width:230px;"><label>Template Tugas</label><select name="task_template_id" class="form-control"><option value="">Tanpa template</option>@foreach($taskTemplates as $template)<option value="{{ $template->id }}" @selected(old('task_template_id', $dailyTask->task_template_id) == $template->id)>{{ $template->name }}</option>@endforeach</select>@error('task_template_id')<p class="field-error">{{ $message }}</p>@enderror</div>
+        <div class="form-field"><label>Status</label><select name="status" class="form-control">@foreach($statuses as $value => $label)<option value="{{ $value }}" @selected(old('status', $dailyTask->status ?: 'pending') === $value)>{{ $label }}</option>@endforeach</select>@error('status')<p class="field-error">{{ $message }}</p>@enderror</div>
+    </div>
+    <div class="filter-grid" style="margin-top:16px;align-items:start;">
+        <div class="form-field" style="flex:1;min-width:260px;"><label>Judul Tugas</label><input type="text" name="title" value="{{ old('title', $dailyTask->title) }}" class="form-control" placeholder="Kosongkan jika memakai template">@error('title')<p class="field-error">{{ $message }}</p>@enderror</div>
+        <div class="form-field"><label>Area</label><input type="text" name="area" value="{{ old('area', $dailyTask->area) }}" class="form-control" placeholder="Otomatis dari template/petugas">@error('area')<p class="field-error">{{ $message }}</p>@enderror</div>
+        <div class="form-field"><label>Shift</label><input type="text" name="shift" value="{{ old('shift', $dailyTask->shift) }}" class="form-control" placeholder="pagi / siang">@error('shift')<p class="field-error">{{ $message }}</p>@enderror</div>
+    </div>
+    <div class="form-field" style="margin-top:16px;"><label>Deskripsi</label><textarea name="description" class="form-control" style="min-height:100px;padding-top:12px;" placeholder="Kosongkan jika mengikuti template">{{ old('description', $dailyTask->description) }}</textarea>@error('description')<p class="field-error">{{ $message }}</p>@enderror</div>
+    <div class="form-field" style="margin-top:16px;"><label>Catatan</label><textarea name="notes" class="form-control" style="min-height:90px;padding-top:12px;" placeholder="Catatan admin atau petugas">{{ old('notes', $dailyTask->notes) }}</textarea>@error('notes')<p class="field-error">{{ $message }}</p>@enderror</div>
+    <div class="form-actions"><button class="btn-primary" type="submit">Simpan Tugas Harian</button><a href="{{ route('daily-tasks.index') }}" class="btn-secondary">Batal</a></div>
+</div>
